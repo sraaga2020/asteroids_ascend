@@ -3,7 +3,3 @@ pandas
 scikit-learn
 streamlit
 
-requests
-datetime
-timedelta
-plotly.graph_objs

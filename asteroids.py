@@ -71,6 +71,7 @@ elif st.session_state.section == 'asteroids':
     st.markdown("""
 - **Affects the trajectory of the asteroid and the time it takes to pass Earth.**
 - **Higher relative velocity generally results in shorter interaction times, reducing gravitational deflection.**
+-**Suggested range: 15 - 90 km/hr**
 """)
     st.title("Eccentricity")
     st.markdown("""
@@ -84,6 +85,7 @@ elif st.session_state.section == 'asteroids':
     st.markdown("""
 - **The angle between the asteroid's orbital plane and Earth's orbital plane.**
 - **Higher inclination generally means the asteroid is less likely to cross Earth's path, increasing miss distance.**
+- **Suggested range: 0 - 20**
 """)
     if st.button("Create Asteroid!"):
         st.session_state.section = 'inputs'

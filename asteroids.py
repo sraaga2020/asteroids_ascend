@@ -1,4 +1,3 @@
-# import packages
 import numpy as np 
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -7,11 +6,8 @@ from sklearn.tree import DecisionTreeClassifier
 import streamlit as st
 import time
 
-# prepare data
 df = pd.read_csv('nasa.csv')
-
-# train models
-@st.cache
+@st.cache_data
 def train_models(df):
 
     label_encoder = LabelEncoder()
@@ -90,16 +86,18 @@ def run_asteroids():
     - **The angle between the asteroid's orbital plane and Earth's orbital plane.**
     - **Higher inclination generally means the asteroid is less likely to cross Earth's path, increasing miss distance.**
     """)
-        if st.button("Launch Asteroid!"):
+        if st.button("Create Asteroid!"):
             st.session_state.section = 'inputs'
-
+            
     elif st.session_state.section == 'inputs':
-
+        if st.button("Asteroids 101"):
+            st.session_state.section = 'asteroids'
         # user inputs
         relative_velocity = st.number_input("Relative Velocity: ")
         inclination = st.number_input("Inclination: ")
         eccentricity = st.number_input("Eccentricity: ")
 
+        st.button("Launch!")
 
         if relative_velocity != 0 and inclination != 0 and eccentricity != 0:
             # model predictions
@@ -107,21 +105,32 @@ def run_asteroids():
             abs_mag = dtree_mag.predict(X_user)
             miss_dist = dtree_missdist.predict(X_user)
 
-            #st.write(abs_mag, miss_dist)
+            st.write("Launching . . .")
+            time.sleep(2)
+
+            st.write("Your asteroid was this far from the Earth: ", str(miss_dist[0]), " km")
+            st.write("Calculating destruction . . .")
+            time.sleep(2)
 
             # classify asteroid risk
-            if abs_mag < 16 and miss_dist < 7500:
+            if abs_mag > 0 and miss_dist < 1000000:
                 st.write("You have accomplished your mission evil scientist! Your asteroid was on point and shattered the Earth into pieces! You are crowned emporer of the alien race!")
-            elif abs_mag < 16 and miss_dist < 50000:
+                st.image("https://dailygalaxy.com/wp-content/uploads/2024/09/Could-a-Nuclear-Explosion-Redirect-an-Asteroid-New-Research-Says-Yes.jpg")
+            elif abs_mag > 1000000 and miss_dist < 3000000:
                 st.write("Impressive evil scientist! Your asteroid has caused mass destruction throughout the North American continent! It is a blow the humans will never recover from!")
-            elif 16 <= abs_mag < 22 and miss_dist < 100000:
+                st.image("https://idsb.tmgrup.com.tr/ly/uploads/images/2020/03/04/thumbs/800x531/23480.jpg?v=1583322397")
+            elif 16 <= abs_mag > 3000000 and miss_dist < 6000000:
                 st.write("Hmmf. Not too bad evil scientist. But, your asteroid has only scared the little humans and sailed through Earth's orbit. DO BETTER.")
-            elif abs_mag >= 22 and miss_dist < 384400: 
+                st.image("https://i0.wp.com/newspaceeconomy.ca/wp-content/uploads/2024/06/newspaceeconomy_picture_of_an_asteroid_striking_earth_cinematic_66f0fde4-b492-478a-8815-e063ac2ec0dd-1.png?fit=1024%2C1024&quality=80&ssl=1")
+            elif abs_mag >= 6000000 and miss_dist < 15000000: 
                 st.write("You have failed your mission evil scientist! The asteroid you launched has barely touched Earth's orbit.")
-            elif abs_mag >= 25 or miss_dist >= 7500000:
+                st.image("https://files.oaiusercontent.com/file-RrTrnENQD64kAqJ9UDmRkYyK?se=2024-11-17T04%3A01%3A58Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D12760535-6149-4fd2-b4d1-83790538f5d3.webp&sig=VlqjYzVewlK6VUXkWoBlyMY19aeYPBSW5yHejHy9aoI%3D")
+            elif abs_mag >= 15000000 or miss_dist >= 25000000:
                 st.write("You have failed your mission evil scientist! The asteroid you launched has harmlessly sailed past Earth.")
+                st.image("https://files.oaiusercontent.com/file-RrTrnENQD64kAqJ9UDmRkYyK?se=2024-11-17T04%3A01%3A58Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D12760535-6149-4fd2-b4d1-83790538f5d3.webp&sig=VlqjYzVewlK6VUXkWoBlyMY19aeYPBSW5yHejHy9aoI%3D")
             else:
-                st.write("no risk")
-        
-        if st.button("Asteroids 101"):
-            st.session_state.section = 'asteroids'
+                st.write("You have failed your mission evil scientist! The asteroid you launched has harmlessly sailed past Earth.")
+                st.image("https://files.oaiusercontent.com/file-RrTrnENQD64kAqJ9UDmRkYyK?se=2024-11-17T04%3A01%3A58Z&sp=r&sv=2024-08-04&sr=b&rscc=max-age%3D604800%2C%20immutable%2C%20private&rscd=attachment%3B%20filename%3D12760535-6149-4fd2-b4d1-83790538f5d3.webp&sig=VlqjYzVewlK6VUXkWoBlyMY19aeYPBSW5yHejHy9aoI%3D")
+
+
+            

@@ -1,12 +1,9 @@
-import streamlit as st
 import plotly.graph_objs as go
-# Setting page configuration
-st.set_page_config(
-    page_title="Asteroid Impact Simulator",
-    page_icon=":comet:",
-    layout="wide"
-)
-
+import streamlit as st
+from datetime import datetime, timedelta
+import requests
+import pandas as pd
+import numpy as np
 # Define NASA API key and endpoint
 API_KEY = "rb2YlKiDL61HAOxF394nFFWbA8bDxSal10d1Cr8y"
 API_ENDPOINT = "https://api.nasa.gov/neo/rest/v1/feed"

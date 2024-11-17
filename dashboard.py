@@ -6,11 +6,10 @@ import pandas as pd
 import numpy as np
 import os
 
-# Define NASA API endpoint
+# Define NASA API endpoint and API key
 API_ENDPOINT = "https://api.nasa.gov/neo/rest/v1/feed"
 API_KEY = os.getenv("NASA_API_KEY", "DEMO_KEY")  # Use an environment variable for API key
 
-# Fetch Asteroid Data using NASA API
 @st.cache_data
 def fetch_asteroid_data(start_date, end_date):
     params = {
@@ -20,11 +19,11 @@ def fetch_asteroid_data(start_date, end_date):
     }
     try:
         response = requests.get(API_ENDPOINT, params=params)
-        response.raise_for_status()  # Raise an HTTPError for bad responses
+        response.raise_for_status()
         data = response.json()
     except requests.exceptions.RequestException as e:
         st.error(f"Error fetching data from NASA API: {e}")
-        return pd.DataFrame()  # Return empty DataFrame on error
+        return pd.DataFrame()  # Return an empty DataFrame on error
 
     asteroids = []
     for date in data.get('near_earth_objects', {}):
@@ -39,24 +38,26 @@ def fetch_asteroid_data(start_date, end_date):
                     'hazardous': asteroid['is_potentially_hazardous_asteroid']
                 })
             except (KeyError, IndexError, ValueError):
-                continue  # Skip asteroids with incomplete data
+                continue
 
     return pd.DataFrame(asteroids)
 
-# Fetch data for the next 7 days (simulating real-time data)
-start_date = datetime.now().strftime('%Y-%m-%d')
-end_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-asteroid_df = fetch_asteroid_data(start_date, end_date)
+def run_dashboard():
+    # Fetch data for the next 7 days
+    start_date = datetime.now().strftime('%Y-%m-%d')
+    end_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+    asteroid_df = fetch_asteroid_data(start_date, end_date)
 
-# Layout the Streamlit App
-st.markdown(
-    "<h1 style='text-align: center; color: #CFCFCF;'>Asteroid Impact Simulator 🚀</h1>",
-    unsafe_allow_html=True
-)
+    # Layout for the app
+    st.markdown(
+        "<h1 style='text-align: center; color: #CFCFCF;'>Asteroid Impact Simulator 🚀</h1>",
+        unsafe_allow_html=True
+    )
 
-if asteroid_df.empty:
-    st.warning("No asteroid data available. Check your API key or internet connection.")
-else:
+    if asteroid_df.empty:
+        st.warning("No asteroid data available. Check your API key or internet connection.")
+        return  # Stop execution if no data is available
+
     # Display Data Metrics
     st.markdown("---")
     st.subheader("Asteroid Metrics Overview")
@@ -79,21 +80,20 @@ else:
     st.write(f"**Potentially Hazardous:** {selected_data['hazardous'].values[0]}")
 
     diameter = selected_data['diameter_m'].values[0]
-    speed = selected_data['speed_kmh'].values[0]  # Speed in km/h
-    distance = selected_data['distance_km'].values[0]  # Distance from Earth in km
+    speed = selected_data['speed_kmh'].values[0]
+    distance = selected_data['distance_km'].values[0]
 
-    # Assume larger diameter and speed leads to a bigger impact radius
-    impact_radius = np.log(diameter) * 10 if diameter > 0 else 0  # Scale impact radius by the diameter
-    impact_location = [20 + np.random.uniform(-5, 5), 0 + np.random.uniform(-5, 5)]  # Random location on Earth map
+    # Impact simulation logic
+    impact_radius = np.log(diameter) * 10 if diameter > 0 else 0
+    impact_location = [20 + np.random.uniform(-5, 5), 0 + np.random.uniform(-5, 5)]
 
-    # Create a Scatter Plot for the asteroid impact
     trace = go.Scattergeo(
         lon=[impact_location[1]],
         lat=[impact_location[0]],
         text=[f"Impact!\nDiameter: {diameter} m\nSpeed: {speed} km/h\nImpact Radius: {impact_radius:.2f} km"],
         mode="markers+text",
         marker=dict(
-            size=impact_radius,  # Impact radius
+            size=impact_radius,
             color='red',
             opacity=0.7,
             line=dict(width=1, color='black')
@@ -114,11 +114,9 @@ else:
     )
 
     fig = go.Figure(data=[trace], layout=layout)
-
-    # Display the impact animation in the app
     st.plotly_chart(fig, use_container_width=True)
 
-    # Add a brief caption about the impact
+    # Add a caption about the impact
     st.markdown(
         """
         ### Impact Simulation

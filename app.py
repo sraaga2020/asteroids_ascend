@@ -6,16 +6,16 @@ st.title("Home Page")
 st.write("Welcome! Choose an app to run:")
 
 if st.button("Asteroid Dashboard"):
-    st.session_state.current_app = "dashboard"
+    st.session_state = "dashboard"
 
 if st.button("Alien Asteroid Mission"):
-    st.session_state.current_app = "asteroids"
+    st.session_state = "asteroids"
 
-if st.session_state.current_app == "dashboard":
+if st.session_state == "dashboard":
     run_dashboard()
 
-elif st.session_state.current_app == "asteroids":
+elif st.session_state == "asteroids":
     run_asteroids()
 
     if st.button("Back to Home"):
-        st.session_state.current_app = "home"
+        st.session_state = "home"
